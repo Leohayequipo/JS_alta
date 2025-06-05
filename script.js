@@ -7,11 +7,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const nombre = document.getElementById('nombre').value.trim();
         const email = document.getElementById('email').value.trim();
         const telefono = document.getElementById('telefono').value.trim();
-        const edad = document.getElementById('edad').value.trim();
+        const edadValor = document.getElementById('edad').value.trim();
         const comentario = document.getElementById('comentario').value.trim();
 
         // Validación
-        if (!nombre || !email || !telefono || !edad || !comentario) {
+        if (!nombre || !email || !telefono || !edadValor || !comentario) {
             alert('Por favor, completa todos los campos.');
             return;
         }
@@ -22,11 +22,17 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const edadNumero = parseInt(edadValor);
+        if (Number.isNaN(edadNumero)) {
+            alert('Ingresa una edad válida.');
+            return;
+        }
+
         const datos = {
             nombre,
             email,
             telefono,
-            edad: parseInt(edad),
+            edad: edadNumero,
             comentario
         };
 
