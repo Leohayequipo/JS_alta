@@ -1,20 +1,14 @@
 <?php
 header('Content-Type: application/json');
+ob_start(); // Inicia el buffer de salida
 
-// Conectar a la base de datos
-try {
-    $pdo = new PDO('mysql:host=localhost;dbname=dbform;charset=utf8mb4', 'root', '');
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'Error al conectar con la base de datos']);
-    exit;
-}
+require 'conexion.php'; // Usa la conexión centralizada
 
 // Leer JSON recibido
 $input = file_get_contents('php://input');
 $data = json_decode($input, true);
 if ($data === null) {
+    ob_end_clean();
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'JSON inválido']);
     exit;
@@ -24,6 +18,7 @@ if ($data === null) {
 $required = ['nombre', 'email', 'telefono', 'edad', 'comentario'];
 foreach ($required as $field) {
     if (empty($data[$field])) {
+        ob_end_clean();
         http_response_code(400);
         echo json_encode(['success' => false, 'message' => "Falta el campo: $field"]);
         exit;
@@ -31,6 +26,7 @@ foreach ($required as $field) {
 }
 
 if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+    ob_end_clean();
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'Email inválido']);
     exit;
@@ -38,6 +34,7 @@ if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
 
 $edad = filter_var($data['edad'], FILTER_VALIDATE_INT);
 if ($edad === false) {
+    ob_end_clean();
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'Edad inválida']);
     exit;
@@ -53,8 +50,10 @@ try {
         $edad,
         $data['comentario']
     ]);
+    ob_end_clean();
     echo json_encode(['success' => true, 'message' => 'Datos guardados correctamente']);
 } catch (PDOException $e) {
+    ob_end_clean();
     http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'Error al guardar los datos']);
+    echo json_encode(['success' => false, 'message' => 'Error al guardar los datos: ' . $e->getMessage()]);
 }

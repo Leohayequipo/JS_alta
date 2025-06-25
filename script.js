@@ -45,14 +45,23 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             body: JSON.stringify(datos)
         })
-        .then(response => response.json())
-        .then(result => {
-            console.log('Respuesta del backend:', result);
+        .then(async response => {
+            let result;
+            try {
+                result = await response.json();
+            } catch (e) {
+                throw new Error('Respuesta no válida del servidor');
+            }
+
+            if (!response.ok || !result.success) {
+                throw new Error(result && result.message ? result.message : 'Error desconocido');
+            }
+
             alert(result.message);
         })
         .catch(error => {
             console.error('Error al enviar:', error);
-            alert('Hubo un error al enviar los datos.');
+            alert(error.message || 'Hubo un error al enviar los datos.');
         });
     });
 });
