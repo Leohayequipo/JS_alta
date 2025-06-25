@@ -16,6 +16,4 @@ try {
     exit;
 }
 
-echo json_encode(["success" => true, "message" => "Conexión exitosa"]);
-
 ?>
